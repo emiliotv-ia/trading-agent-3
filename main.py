@@ -311,16 +311,29 @@ def kelly_position_size(s, sym, total_capital):
 MAX_DRAWDOWN_PCT = 0.15
 
 def check_drawdown(s):
+    """
+    Calcula drawdown y ajusta el multiplicador de tamaño de posición.
+    En vez de detener el agente, reduce el tamaño progresivamente:
+      - DD < 10%:  escala normal  (1.0)
+      - DD 10-13%: mitad del tamaño (0.5)
+      - DD > 13%:  cuarto del tamaño (0.25)
+    Nunca detiene el agente automáticamente.
+    """
     total = s["cash"] + sum(p["qty"] * gp(s, sym) for sym, p in s["positions"].items() if p.get("qty", 0) > 0)
     if "peak_capital" not in s or total > s["peak_capital"]:
         s["peak_capital"] = round(total, 2)
     dd = (s["peak_capital"] - total) / s["peak_capital"] if s["peak_capital"] > 0 else 0
     s["current_drawdown"] = round(dd * 100, 2)
-    if dd >= MAX_DRAWDOWN_PCT and not s.get("drawdown_stopped"):
-        s["running"] = False
-        s["drawdown_stopped"] = True
-        log(s, f"🚨 DRAWDOWN STOP: {s['current_drawdown']}% — límite {MAX_DRAWDOWN_PCT*100}%", "warn")
-        save_state(s)
+    s["drawdown_stopped"]  = False  # nunca se detiene solo
+
+    if dd >= 0.13:
+        s["drawdown_scale"] = 0.25
+        log(s, f"⚠️ Drawdown {s['current_drawdown']}% — operando al 25% del tamaño normal", "warn")
+    elif dd >= 0.10:
+        s["drawdown_scale"] = 0.5
+        log(s, f"⚠️ Drawdown {s['current_drawdown']}% — operando al 50% del tamaño normal", "warn")
+    else:
+        s["drawdown_scale"] = 1.0
 
 # -------------------------------------------------------
 # HELPERS
@@ -853,7 +866,7 @@ def run_cycle(s):
         ml_mult  = ml_confidence_multiplier(s, sym)
         # Extra boost when convergence is very strong (6-7/7)
         conv_boost = 1.0 + 0.15 * max(0, score - CONVERGENCE_BUY_THRESHOLD)
-        invest   = total_cap * sz_pct * ml_mult * conv_boost
+        invest   = total_cap * sz_pct * ml_mult * conv_boost * s.get("drawdown_scale", 1.0)
         invest   = min(invest, s["cash"] * 0.95)
         qty      = int(invest / price)
 
