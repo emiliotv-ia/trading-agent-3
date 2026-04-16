@@ -948,6 +948,10 @@ def index():
 def dashboard():
     return send_from_directory(".", "dashboard.html")
 
+@app.route("/comparador")
+def comparador():
+    return send_from_directory(".", "comparador.html")
+
 @app.route("/state")
 def get_state():
     total   = state["cash"] + sum(p["qty"] * gp(state, sym)
