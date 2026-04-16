@@ -190,12 +190,12 @@ def init_db():
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                CREATE TABLE IF NOT EXISTS agent_state (
+                CREATE TABLE IF NOT EXISTS agent3_state (
                     id SERIAL PRIMARY KEY,
                     data JSONB NOT NULL,
                     updated_at TIMESTAMP DEFAULT NOW()
                 );
-                CREATE TABLE IF NOT EXISTS reports (
+                CREATE TABLE IF NOT EXISTS agent3_reports (
                     id SERIAL PRIMARY KEY,
                     texto TEXT,
                     resumen JSONB,
@@ -212,13 +212,13 @@ def save_state(s):
         return
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT id FROM agent_state LIMIT 1")
+            cur.execute("SELECT id FROM agent3_state LIMIT 1")
             row = cur.fetchone()
             data = json.dumps(s)
             if row:
-                cur.execute("UPDATE agent_state SET data=%s, updated_at=NOW() WHERE id=%s", (data, row["id"]))
+                cur.execute("UPDATE agent3_state SET data=%s, updated_at=NOW() WHERE id=%s", (data, row["id"]))
             else:
-                cur.execute("INSERT INTO agent_state (data) VALUES (%s)", (data,))
+                cur.execute("INSERT INTO agent3_state (data) VALUES (%s)", (data,))
             conn.commit()
     except Exception as e:
         print(f"Save state error: {e}")
@@ -231,7 +231,7 @@ def load_state():
         return None
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT data FROM agent_state ORDER BY id DESC LIMIT 1")
+            cur.execute("SELECT data FROM agent3_state ORDER BY id DESC LIMIT 1")
             row = cur.fetchone()
             return row["data"] if row else None
     except Exception as e:
@@ -1119,10 +1119,10 @@ def save_report():
                 "win_rate": data.get("win_rate", 0),
                 "ciclos":   data.get("ciclos", 0),
             })
-            cur.execute("INSERT INTO reports (texto, resumen) VALUES (%s, %s::jsonb) RETURNING id",
+            cur.execute("INSERT INTO agent3_reports (texto, resumen) VALUES (%s, %s::jsonb) RETURNING id",
                         (data.get("texto", ""), resumen))
             report_id = cur.fetchone()["id"]
-            cur.execute("SELECT COUNT(*) as total FROM reports")
+            cur.execute("SELECT COUNT(*) as total FROM agent3_reports")
             total = cur.fetchone()["total"]
             conn.commit()
             return jsonify({"ok": True, "id": report_id, "total": total})
@@ -1136,7 +1136,7 @@ def get_reports():
         return jsonify({"reports": []})
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, resumen, created_at FROM reports ORDER BY id DESC LIMIT 30")
+            cur.execute("SELECT id, resumen, created_at FROM agent3_reports ORDER BY id DESC LIMIT 30")
             rows = cur.fetchall()
             return jsonify({"reports": [
                 {"id": r["id"],
