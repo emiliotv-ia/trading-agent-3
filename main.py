@@ -931,6 +931,11 @@ def init_state():
         print("✅ Estado restaurado desde DB")
     else:
         print("🆕 Estado inicial creado")
+    # Siempre arrancar si hay API keys — nunca depender del estado guardado en DB
+    if ALPACA_API_KEY and ALPACA_SECRET_KEY:
+        state["running"] = True
+        save_state(state)
+        print("🔄 Agente iniciado automáticamente (API keys detectadas)")
 
 # -------------------------------------------------------
 # AGENT LOOP
