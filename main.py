@@ -943,8 +943,14 @@ def init_state():
 agent_lock = threading.Lock()
 
 def agent_loop():
+    # Forzar running=True siempre que haya API keys (self-healing)
+    if ALPACA_API_KEY and ALPACA_SECRET_KEY:
+        state["running"] = True
     while True:
         try:
+            # Auto-healing: si se apagó por error, se reactiva solo
+            if not state.get("running") and ALPACA_API_KEY and ALPACA_SECRET_KEY:
+                state["running"] = True
             if state.get("running"):
                 with agent_lock:
                     run_cycle(state)
