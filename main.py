@@ -4,6 +4,7 @@ import math
 import random
 import requests
 from datetime import datetime, timedelta
+from functools import wraps
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import psycopg2
@@ -25,8 +26,21 @@ DATABASE_URL      = os.environ.get("DATABASE_URL")
 ALPACA_API_KEY    = os.environ.get("ALPACA_API_KEY")
 ALPACA_SECRET_KEY = os.environ.get("ALPACA_SECRET_KEY")
 ALPACA_BASE_URL   = os.environ.get("ALPACA_BASE_URL", "https://paper-api.alpaca.markets")
-FINNHUB_API_KEY   = os.environ.get("FINNHUB_API_KEY", "d7arc29r01qtpbh9igcgd7arc29r01qtpbh9igd0")
-NEWS_API_KEY      = os.environ.get("NEWS_API_KEY",    "0a7437acf2664cf488d2287b22e6721d")
+FINNHUB_API_KEY   = os.environ.get("FINNHUB_API_KEY")
+NEWS_API_KEY      = os.environ.get("NEWS_API_KEY")
+
+# --- AUTH ---
+API_TOKEN = os.environ.get("API_TOKEN", "")
+
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if API_TOKEN:
+            token = request.headers.get("Authorization", "").replace("Bearer ", "").strip()
+            if token != API_TOKEN:
+                return jsonify({"error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated
 
 trading_client    = None
 stock_data_client = None
@@ -1107,12 +1121,14 @@ def get_sentiment():
     return jsonify({"sentiment": data, "symbols": len(data)})
 
 @app.route("/sentiment/refresh", methods=["POST"])
+@require_auth
 def refresh_sentiment():
     t = threading.Thread(target=update_sentiment_cache, daemon=True)
     t.start()
     return jsonify({"ok": True})
 
 @app.route("/start", methods=["POST"])
+@require_auth
 def start():
     state["running"] = True
     state["drawdown_stopped"] = False
@@ -1121,6 +1137,7 @@ def start():
     return jsonify({"ok": True, "running": True})
 
 @app.route("/stop", methods=["POST"])
+@require_auth
 def stop():
     state["running"] = False
     save_state(state)
@@ -1128,6 +1145,7 @@ def stop():
     return jsonify({"ok": True, "running": False})
 
 @app.route("/config", methods=["POST"])
+@require_auth
 def set_config():
     data = request.get_json() or {}
     for k in ("freq", "sl", "tp", "sz", "risk"):
@@ -1141,6 +1159,7 @@ def set_config():
     return jsonify({"ok": True, "config": state["config"]})
 
 @app.route("/mode", methods=["POST"])
+@require_auth
 def set_mode():
     data = request.get_json() or {}
     if data.get("mode") in ("alpha", "beta"):
@@ -1149,6 +1168,7 @@ def set_mode():
     return jsonify({"ok": True, "mode": state.get("mode")})
 
 @app.route("/reset", methods=["POST"])
+@require_auth
 def reset():
     global state
     state = make_default_state()
@@ -1156,6 +1176,7 @@ def reset():
     return jsonify({"ok": True})
 
 @app.route("/save_report", methods=["POST"])
+@require_auth
 def save_report():
     data = request.get_json() or {}
     conn = get_db()

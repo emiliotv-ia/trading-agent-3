@@ -386,8 +386,10 @@ if(sessionStorage.getItem('auth3')==='ok'){
 }
 
 function fmt(n){return'$'+Math.abs(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+const API_TOKEN = window.localStorage.getItem('api_token') || '';
+
 async function api(path,method='GET',body=null){
-  const opts={method,headers:{'Content-Type':'application/json'}};
+  const opts={method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_TOKEN}};
   if(body) opts.body=JSON.stringify(body);
   const r=await fetch(API_BASE+path,opts);
   return r.json();
