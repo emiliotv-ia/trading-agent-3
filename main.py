@@ -723,8 +723,21 @@ def execute_buy(s, sym, qty, price, conv_score, factor_breakdown, features):
                                        side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
             trading_client.submit_order(order)
         except Exception as e:
-            log(s, f"Order error BUY {sym}: {e}", "warn")
-            return False
+            err_str = str(e).lower()
+            if "unauthorized" in err_str or "401" in err_str:
+                log(s, f"⚠️ Auth error BUY {sym} — reiniciando cliente Alpaca...", "warn")
+                init_alpaca()  # auto-recover
+                try:
+                    if trading_client:
+                        trading_client.submit_order(order)
+                    else:
+                        return False
+                except Exception as e2:
+                    log(s, f"Order error BUY {sym} (retry): {e2}", "warn")
+                    return False
+            else:
+                log(s, f"Order error BUY {sym}: {e}", "warn")
+                return False
     s["cash"] -= cost
     s["positions"][sym] = {"qty": qty, "avg_cost": price,
                            "entry_features": features,
@@ -761,7 +774,17 @@ def execute_sell(s, sym, pos, price, reason, conv_score):
                                        side=OrderSide.SELL, time_in_force=TimeInForce.DAY)
             trading_client.submit_order(order)
         except Exception as e:
-            log(s, f"Order error SELL {sym}: {e}", "warn")
+            err_str = str(e).lower()
+            if "unauthorized" in err_str or "401" in err_str:
+                log(s, f"⚠️ Auth error SELL {sym} — reiniciando cliente Alpaca...", "warn")
+                init_alpaca()
+                try:
+                    if trading_client:
+                        trading_client.submit_order(order)
+                except Exception as e2:
+                    log(s, f"Order error SELL {sym} (retry): {e2}", "warn")
+            else:
+                log(s, f"Order error SELL {sym}: {e}", "warn")
     s["cash"] = round(s["cash"] + qty * price, 2)
     s["positions"][sym] = {"qty": 0, "avg_cost": 0}
     action = "TP" if ret >= s["config"]["tp"]/100 else "SL" if ret <= -s["config"]["sl"]/100 else "VENTA"
