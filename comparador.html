@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comparador — 3 Agentes</title>
+<title>Comparador — 4 Agentes</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#111;}
@@ -14,6 +14,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
 .on-1{background:#1D9E75;animation:beat .9s infinite;}
 .on-2{background:#6c3fc5;animation:beat .9s infinite;}
 .on-3{background:#d97706;animation:beat .9s infinite;}
+.on-4{background:#dc2626;animation:beat .9s infinite;}
 .off{background:#aaa;}
 @keyframes beat{0%,100%{opacity:1;}50%{opacity:.2;}}
 
@@ -25,9 +26,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
 .bo{background:#fef3c7;color:#92400e;}.bx{background:#f3f4f6;color:#555;}
 .g{color:#0F6E56;}.r{color:#A32D2D;}
 
-/* 3-col agent panels */
+/* 3-col / 4-col agent panels */
 .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
-@media(max-width:900px){.three-col{grid-template-columns:1fr;}}
+.four-col{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+@media(max-width:1100px){.four-col{grid-template-columns:1fr 1fr;}}
+@media(max-width:900px){.three-col{grid-template-columns:1fr;}.four-col{grid-template-columns:1fr;}}
 @media(max-width:600px){.two-col{grid-template-columns:1fr;}}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 
@@ -37,9 +40,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
 .a1h{background:linear-gradient(135deg,#e8faf4,#f0fdf4);border-bottom:2px solid #1D9E75;}
 .a2h{background:linear-gradient(135deg,#f0ebff,#faf5ff);border-bottom:2px solid #6c3fc5;}
 .a3h{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-bottom:2px solid #d97706;}
+.a4h{background:linear-gradient(135deg,#fee2e2,#fef2f2);border-bottom:2px solid #dc2626;}
 .a1n{color:#0F6E56;font-size:14px;font-weight:700;}
 .a2n{color:#5b21b6;font-size:14px;font-weight:700;}
 .a3n{color:#b45309;font-size:14px;font-weight:700;}
+.a4n{color:#991b1b;font-size:14px;font-weight:700;}
 .agent-body{padding:14px 16px;}
 
 /* Mini metric grid */
@@ -48,7 +53,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
 .ml{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
 .mv{font-size:18px;font-weight:600;}
 .ms{font-size:11px;margin-top:2px;color:#888;}
-.a1v{color:#0F6E56;}.a2v{color:#5b21b6;}.a3v{color:#d97706;}
+.a1v{color:#0F6E56;}.a2v{color:#5b21b6;}.a3v{color:#d97706;}.a4v{color:#dc2626;}
 
 /* DD bar */
 .dd-bar-wrap{height:5px;border-radius:3px;background:#f0f0f0;margin-top:4px;overflow:hidden;}
@@ -62,7 +67,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
 .cmp-table tr:hover td{background:#fafafa;}
 .lbl{color:#555;font-weight:500;}
 .winner{font-weight:700;}
-.a1v2{color:#0F6E56;}.a2v2{color:#5b21b6;}.a3v2{color:#d97706;}
+.a1v2{color:#0F6E56;}.a2v2{color:#5b21b6;}.a3v2{color:#d97706;}.a4v2{color:#dc2626;}
 
 /* Tabs */
 .tabs{display:flex;gap:4px;border-bottom:1px solid #e0e0e0;margin-bottom:20px;flex-wrap:wrap;}
@@ -134,8 +139,10 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
     <input type="text" id="url1-input" placeholder="https://trading-agent-xxxx.onrender.com">
     <label>🟣 Agente 2 — MTF + ML + Kelly</label>
     <input type="text" id="url2-input" placeholder="https://trading-agent-2.onrender.com">
-    <label>🟠 Agente 3 — Multi-Factor Convergence</label>
-    <input type="text" id="url3-input" placeholder="https://trading-agent-3.onrender.com">
+    <label>🟠 Agente 3 — Multi-Factor Convergence (4/7)</label>
+    <input type="text" id="url3-input" placeholder="https://trading-agent-3web.onrender.com">
+    <label>🔴 Agente 3B — Multi-Factor Convergence (3/7)</label>
+    <input type="text" id="url4-input" placeholder="https://trading-agent-3b.onrender.com">
     <div class="modal-btns">
       <button class="btn" onclick="closeCfg()">Cancelar</button>
       <button class="btn btn-go" onclick="saveUrls()">Guardar y conectar</button>
@@ -147,11 +154,12 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
 <div id="app" style="display:none;">
 <div class="header">
   <div style="display:flex;align-items:center;gap:14px;">
-    <h1>Comparador — 3 Agentes</h1>
+    <h1>Comparador — 4 Agentes</h1>
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888;">
       <span class="pulse off" id="p1"></span>A1
       <span class="pulse off" id="p2" style="margin-left:6px;"></span>A2
       <span class="pulse off" id="p3" style="margin-left:6px;"></span>A3
+      <span class="pulse off" id="p4" style="margin-left:6px;"></span>A3B
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
@@ -173,8 +181,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
   <!-- COMPARACIÓN TAB -->
   <div id="tab-compare" class="sp active">
 
-    <!-- 3 agent panels -->
-    <div class="three-col">
+    <!-- 4 agent panels -->
+    <div class="four-col">
       <!-- A1 -->
       <div class="agent-panel">
         <div class="agent-header a1h">
@@ -210,7 +218,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
       <!-- A3 -->
       <div class="agent-panel">
         <div class="agent-header a3h">
-          <div><span class="a3n">Agente 3</span><span class="badge bo" style="margin-left:6px;">Multi-Factor</span></div>
+          <div><span class="a3n">Agente 3</span><span class="badge bo" style="margin-left:6px;">MFC 4/7</span></div>
           <span id="a3-status-lbl" style="font-size:11px;color:#888;">—</span>
         </div>
         <div class="agent-body">
@@ -221,6 +229,22 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
             <div class="mc"><div class="ml">Barras</div><div class="mv" id="a3-bars" style="font-size:13px;">—</div></div>
           </div>
           <div style="font-size:11px;color:#555;" id="a3-pos-lbl"></div>
+        </div>
+      </div>
+      <!-- A3B -->
+      <div class="agent-panel">
+        <div class="agent-header a4h">
+          <div><span class="a4n">Agente 3B</span><span class="badge br" style="margin-left:6px;">MFC 3/7</span></div>
+          <span id="a4-status-lbl" style="font-size:11px;color:#888;">—</span>
+        </div>
+        <div class="agent-body">
+          <div class="mg3">
+            <div class="mc"><div class="ml">Capital</div><div class="mv a4v" id="a4-cap">—</div><div class="ms" id="a4-pct">—</div></div>
+            <div class="mc"><div class="ml">Win rate</div><div class="mv" id="a4-wr">—</div><div class="ms" id="a4-ops">—</div></div>
+            <div class="mc"><div class="ml">Drawdown</div><div class="mv" id="a4-dd">—</div><div class="dd-bar-wrap"><div class="dd-bar-fill" id="a4-dd-bar"></div></div></div>
+            <div class="mc"><div class="ml">Barras</div><div class="mv" id="a4-bars" style="font-size:13px;">—</div></div>
+          </div>
+          <div style="font-size:11px;color:#555;" id="a4-pos-lbl"></div>
         </div>
       </div>
     </div>
@@ -235,6 +259,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
             <th style="color:#0F6E56;">Agente 1</th>
             <th style="color:#5b21b6;">Agente 2</th>
             <th style="color:#d97706;">Agente 3</th>
+            <th style="color:#dc2626;">Agente 3B</th>
             <th>Ventaja</th>
           </tr>
         </thead>
@@ -245,16 +270,17 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
     </div>
 
     <!-- Last decisions side by side -->
-    <div class="three-col">
+    <div class="four-col">
       <div class="card"><div class="ct" style="color:#0F6E56;">Últimas — Agente 1</div><div id="a1-dec"></div></div>
       <div class="card"><div class="ct" style="color:#5b21b6;">Últimas — Agente 2</div><div id="a2-dec"></div></div>
       <div class="card"><div class="ct" style="color:#d97706;">Últimas — Agente 3</div><div id="a3-dec"></div></div>
+      <div class="card"><div class="ct" style="color:#dc2626;">Últimas — Agente 3B</div><div id="a4-dec"></div></div>
     </div>
   </div>
 
   <!-- DETALLE TAB -->
   <div id="tab-detail" class="sp">
-    <div class="three-col">
+    <div class="four-col">
       <div class="card">
         <div class="ct" style="color:#0F6E56;border-bottom:2px solid #1D9E75;padding-bottom:8px;">Agente 1 — Simple</div>
         <div id="a1-full" style="font-size:13px;color:#888;margin-top:8px;">—</div>
@@ -272,22 +298,31 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#11
         <div id="a2-pos"></div>
       </div>
       <div class="card">
-        <div class="ct" style="color:#d97706;border-bottom:2px solid #d97706;padding-bottom:8px;">Agente 3 — Multi-Factor</div>
+        <div class="ct" style="color:#d97706;border-bottom:2px solid #d97706;padding-bottom:8px;">Agente 3 — MFC 4/7</div>
         <div id="a3-full" style="font-size:13px;color:#888;margin-top:8px;">—</div>
         <div style="margin-top:14px;font-size:12px;font-weight:600;color:#666;margin-bottom:8px;">Convergencia top</div>
         <div id="a3-factors"></div>
         <div style="margin-top:14px;font-size:12px;font-weight:600;color:#666;margin-bottom:8px;">Posiciones</div>
         <div id="a3-pos"></div>
       </div>
+      <div class="card">
+        <div class="ct" style="color:#dc2626;border-bottom:2px solid #dc2626;padding-bottom:8px;">Agente 3B — MFC 3/7</div>
+        <div id="a4-full" style="font-size:13px;color:#888;margin-top:8px;">—</div>
+        <div style="margin-top:14px;font-size:12px;font-weight:600;color:#666;margin-bottom:8px;">Convergencia top</div>
+        <div id="a4-factors"></div>
+        <div style="margin-top:14px;font-size:12px;font-weight:600;color:#666;margin-bottom:8px;">Posiciones</div>
+        <div id="a4-pos"></div>
+      </div>
     </div>
   </div>
 
   <!-- LOGS TAB -->
   <div id="tab-logs" class="sp">
-    <div class="three-col">
+    <div class="four-col">
       <div class="card"><div class="ct" style="color:#0F6E56;">Log Agente 1</div><div class="logbox" id="log1"><div style="color:#888;">—</div></div></div>
       <div class="card"><div class="ct" style="color:#5b21b6;">Log Agente 2</div><div class="logbox" id="log2"><div style="color:#888;">—</div></div></div>
       <div class="card"><div class="ct" style="color:#d97706;">Log Agente 3</div><div class="logbox" id="log3"><div style="color:#888;">—</div></div></div>
+      <div class="card"><div class="ct" style="color:#dc2626;">Log Agente 3B</div><div class="logbox" id="log4"><div style="color:#888;">—</div></div></div>
     </div>
   </div>
 </div>
@@ -298,8 +333,9 @@ const PASSWORD = 'Pichuki12*';
 let URL1 = localStorage.getItem('agent1_url') || 'https://trading-agent-xpiu.onrender.com';
 let URL2 = localStorage.getItem('agent2_url') || 'https://trading-agent-2.onrender.com';
 let URL3 = localStorage.getItem('agent3_url') || 'https://trading-agent-3web.onrender.com';
+let URL4 = localStorage.getItem('agent4_url') || 'https://trading-agent-3b.onrender.com';
 
-let data1=null, data2=null, data3=null;
+let data1=null, data2=null, data3=null, data4=null;
 const SECTOR={NVDA:'Chips IA',MSFT:'Cloud/IA',META:'IA Consumo',GOOGL:'IA/Search',
   AMZN:'Cloud',PLTR:'Data IA',ARKK:'ETF Tech',QQQ:'ETF NASDAQ',
   MU:'Chips/Memoria',TSM:'Chips IA',CEG:'Energía',GEV:'Energía'};
@@ -326,6 +362,7 @@ function openCfg(){
   document.getElementById('url1-input').value=URL1;
   document.getElementById('url2-input').value=URL2;
   document.getElementById('url3-input').value=URL3;
+  document.getElementById('url4-input').value=URL4;
   document.getElementById('cfg-modal').classList.add('open');
 }
 function closeCfg(){document.getElementById('cfg-modal').classList.remove('open');}
@@ -333,9 +370,11 @@ function saveUrls(){
   URL1=document.getElementById('url1-input').value.replace(/\/$/,'');
   URL2=document.getElementById('url2-input').value.replace(/\/$/,'');
   URL3=document.getElementById('url3-input').value.replace(/\/$/,'');
+  URL4=document.getElementById('url4-input').value.replace(/\/$/,'');
   localStorage.setItem('agent1_url',URL1);
   localStorage.setItem('agent2_url',URL2);
   localStorage.setItem('agent3_url',URL3);
+  localStorage.setItem('agent4_url',URL4);
   closeCfg(); refreshAll();
 }
 
@@ -353,8 +392,8 @@ function fmtPct(n){return(n>=0?'+':'')+n+'%';}
 
 // ---- REFRESH ----
 async function refreshAll(){
-  const [r1,r2,r3]=await Promise.allSettled([
-    fetchAgent(URL1), fetchAgent(URL2), fetchAgent(URL3)
+  const [r1,r2,r3,r4]=await Promise.allSettled([
+    fetchAgent(URL1), fetchAgent(URL2), fetchAgent(URL3), fetchAgent(URL4)
   ]);
   const offline=[];
   if(r1.status==='fulfilled'){data1=r1.value; renderAgent(1,data1);}
@@ -363,6 +402,8 @@ async function refreshAll(){
   else{setOffline(2); offline.push('Agente 2');}
   if(r3.status==='fulfilled'){data3=r3.value; renderAgent(3,data3);}
   else{setOffline(3); offline.push('Agente 3');}
+  if(r4.status==='fulfilled'){data4=r4.value; renderAgent(4,data4);}
+  else{setOffline(4); offline.push('Agente 3B');}
 
   const banner=document.getElementById('offline-banner');
   if(offline.length){
@@ -374,29 +415,36 @@ async function refreshAll(){
   renderComparison();
   document.getElementById('last-sync').textContent='sync '+new Date().toLocaleTimeString('es-AR');
 
-  // Fetch factors for agent 3 detail
+  // Fetch factors for agent 3 and 3B detail
   if(r3.status==='fulfilled'){
     try{
       const fd=await fetchFactors(URL3);
-      renderA3Factors(fd.ranked||[], fd.threshold||4);
+      renderA3Factors('a3-factors', fd.ranked||[], fd.threshold||4);
+    }catch(e){}
+  }
+  if(r4.status==='fulfilled'){
+    try{
+      const fd=await fetchFactors(URL4);
+      renderA3Factors('a4-factors', fd.ranked||[], fd.threshold||3);
     }catch(e){}
   }
 }
 
 function setOffline(n){
-  document.getElementById('p'+n).className='pulse off';
-  document.getElementById('a'+n+'-status-lbl').textContent='Sin conexión';
-  document.getElementById('a'+n+'-status-lbl').style.color='#A32D2D';
+  const pEl=document.getElementById('p'+n);
+  if(pEl) pEl.className='pulse off';
+  const sEl=document.getElementById('a'+n+'-status-lbl');
+  if(sEl){sEl.textContent='Sin conexión';sEl.style.color='#A32D2D';}
 }
 
 // ---- RENDER AGENT ----
 function renderAgent(n, d){
-  const pulseClass = n===1?'on-1':n===2?'on-2':'on-3';
-  const valClass   = n===1?'a1v':n===2?'a2v':'a3v';
+  const pulseClass = n===1?'on-1':n===2?'on-2':n===3?'on-3':'on-4';
+  const runColor   = n===1?'#0F6E56':n===2?'#5b21b6':n===3?'#d97706':'#dc2626';
 
   document.getElementById('p'+n).className='pulse '+pulseClass;
   document.getElementById('a'+n+'-status-lbl').textContent= d.running?'Corriendo':'Detenido';
-  document.getElementById('a'+n+'-status-lbl').style.color= d.running?(n===1?'#0F6E56':n===2?'#5b21b6':'#d97706'):'#888';
+  document.getElementById('a'+n+'-status-lbl').style.color= d.running?runColor:'#888';
 
   document.getElementById('a'+n+'-cap').textContent=fmt(d.total||0);
   const pEl=document.getElementById('a'+n+'-pct');
@@ -410,7 +458,7 @@ function renderAgent(n, d){
   const stEl=document.getElementById('a'+n+'-state');
   if(stEl){
     stEl.textContent=d.drawdown_stopped?'Stop DD':d.running?'Activo':'Detenido';
-    stEl.style.color=d.drawdown_stopped?'#A32D2D':d.running?(n===1?'#0F6E56':n===2?'#5b21b6':'#d97706'):'#888';
+    stEl.style.color=d.drawdown_stopped?'#A32D2D':d.running?runColor:'#888';
   }
 
   // Drawdown (A2 & A3)
@@ -455,14 +503,14 @@ function renderAgent(n, d){
 
 // ---- COMPARISON TABLE ----
 function renderComparison(){
-  const d1=data1||{}, d2=data2||{}, d3=data3||{};
+  const d1=data1||{}, d2=data2||{}, d3=data3||{}, d4=data4||{};
 
-  function winner3(v1,v2,v3,higherIsBetter=true){
-    if(!data1&&!data2&&!data3) return null;
+  function winner4(v1,v2,v3,v4,higherIsBetter=true){
     const vals=[];
     if(data1) vals.push([1,v1]);
     if(data2) vals.push([2,v2]);
     if(data3) vals.push([3,v3]);
+    if(data4) vals.push([4,v4]);
     if(!vals.length) return null;
     vals.sort((a,b)=>higherIsBetter?(b[1]-a[1]):(a[1]-b[1]));
     return vals[0][0];
@@ -470,62 +518,65 @@ function renderComparison(){
 
   const rows=[
     {label:'Capital actual',
-     v1:fmt(d1.total||0), v2:fmt(d2.total||0), v3:fmt(d3.total||0),
-     n1:d1.total||0, n2:d2.total||0, n3:d3.total||0, higher:true},
+     v1:fmt(d1.total||0), v2:fmt(d2.total||0), v3:fmt(d3.total||0), v4:fmt(d4.total||0),
+     n1:d1.total||0, n2:d2.total||0, n3:d3.total||0, n4:d4.total||0, higher:true},
     {label:'P&L (%)',
-     v1:fmtPct(d1.pnl_pct||0), v2:fmtPct(d2.pnl_pct||0), v3:fmtPct(d3.pnl_pct||0),
-     n1:d1.pnl_pct||0, n2:d2.pnl_pct||0, n3:d3.pnl_pct||0, higher:true},
+     v1:fmtPct(d1.pnl_pct||0), v2:fmtPct(d2.pnl_pct||0), v3:fmtPct(d3.pnl_pct||0), v4:fmtPct(d4.pnl_pct||0),
+     n1:d1.pnl_pct||0, n2:d2.pnl_pct||0, n3:d3.pnl_pct||0, n4:d4.pnl_pct||0, higher:true},
     {label:'Win rate',
-     v1:(d1.win_rate||0)+'%', v2:(d2.win_rate||0)+'%', v3:(d3.win_rate||0)+'%',
-     n1:d1.win_rate||0, n2:d2.win_rate||0, n3:d3.win_rate||0, higher:true},
+     v1:(d1.win_rate||0)+'%', v2:(d2.win_rate||0)+'%', v3:(d3.win_rate||0)+'%', v4:(d4.win_rate||0)+'%',
+     n1:d1.win_rate||0, n2:d2.win_rate||0, n3:d3.win_rate||0, n4:d4.win_rate||0, higher:true},
     {label:'Operaciones',
-     v1:String(d1.history_count||0), v2:String(d2.history_count||0), v3:String(d3.history_count||0),
-     n1:d1.history_count||0, n2:d2.history_count||0, n3:d3.history_count||0, higher:true},
+     v1:String(d1.history_count||0), v2:String(d2.history_count||0), v3:String(d3.history_count||0), v4:String(d4.history_count||0),
+     n1:d1.history_count||0, n2:d2.history_count||0, n3:d3.history_count||0, n4:d4.history_count||0, higher:true},
     {label:'Ciclos ejecutados',
-     v1:String(d1.cycle||0), v2:String(d2.cycle||0), v3:String(d3.cycle||0),
+     v1:String(d1.cycle||0), v2:String(d2.cycle||0), v3:String(d3.cycle||0), v4:String(d4.cycle||0),
      n1:null},
     {label:'Drawdown actual',
-     v1:'N/A', v2:(d2.current_drawdown||0).toFixed(1)+'%', v3:(d3.current_drawdown||0).toFixed(1)+'%',
+     v1:'N/A', v2:(d2.current_drawdown||0).toFixed(1)+'%', v3:(d3.current_drawdown||0).toFixed(1)+'%', v4:(d4.current_drawdown||0).toFixed(1)+'%',
      n1:null, note:'Mínimo = mejor'},
     {label:'ML Online',
-     v1:'No', v2:d2.ml_active?'Activo':'Acumulando', v3:d3.ml_active?'Activo':'Acumulando',
-     n1:null, note:'Solo A2 y A3'},
-    {label:'Kelly Criterion',
-     v1:'No', v2:'Sí (5%-25%)', v3:'Sí (5%-25%)',
-     n1:null},
+     v1:'No', v2:d2.ml_active?'Activo':'Acumulando', v3:d3.ml_active?'Activo':'Acumulando', v4:d4.ml_active?'Activo':'Acumulando',
+     n1:null, note:'Solo A2, A3, A3B'},
+    {label:'Umbral señales',
+     v1:'N/A', v2:'N/A', v3:'4/7', v4:'3/7',
+     n1:null, note:'A3 vs A3B'},
     {label:'Estrategia',
-     v1:'MA/RSI simple', v2:'MTF + Fibonacci + EMA50', v3:'7 factores convergencia',
+     v1:'MA/RSI simple', v2:'MTF + Fibonacci + EMA50', v3:'7 factores (4/7)', v4:'7 factores (3/7)',
      n1:null},
     {label:'Posiciones abiertas',
      v1:String(Object.values(d1.positions||{}).filter(p=>p&&p.qty>0).length),
      v2:String(Object.values(d2.positions||{}).filter(p=>p&&p.qty>0).length),
      v3:String(Object.values(d3.positions||{}).filter(p=>p&&p.qty>0).length),
+     v4:String(Object.values(d4.positions||{}).filter(p=>p&&p.qty>0).length),
      n1:null},
     {label:'Estado',
      v1:d1.running?'Corriendo':'Detenido',
      v2:d2.drawdown_stopped?'Stop DD':d2.running?'Corriendo':'Detenido',
      v3:d3.drawdown_stopped?'Stop DD':d3.running?'Corriendo':'Detenido',
+     v4:d4.drawdown_stopped?'Stop DD':d4.running?'Corriendo':'Detenido',
      n1:null},
   ];
 
-  const wLabels={1:'<span class="badge bg">A1</span>',2:'<span class="badge bb">A2</span>',3:'<span class="badge bo">A3</span>'};
-  const vClasses={1:'a1v2',2:'a2v2',3:'a3v2'};
+  const wLabels={1:'<span class="badge bg">A1</span>',2:'<span class="badge bb">A2</span>',3:'<span class="badge bo">A3</span>',4:'<span class="badge br">A3B</span>'};
 
   const body=document.getElementById('cmp-body');
   body.innerHTML=rows.map(row=>{
     let w=null;
     if(row.n1!=null){
-      w=winner3(row.n1, row.n2, row.n3, row.higher!==false);
+      w=winner4(row.n1, row.n2, row.n3, row.n4, row.higher!==false);
     }
     const cls1=w===1?' winner a1v2':'';
     const cls2=w===2?' winner a2v2':'';
     const cls3=w===3?' winner a3v2':'';
+    const cls4=w===4?' winner a4v2':'';
     const winnerCell=w?wLabels[w]:(row.note?`<span style="font-size:11px;color:#aaa;">${row.note}</span>`:'<span style="font-size:11px;color:#ddd;">—</span>');
     return `<tr>
       <td class="lbl">${row.label}</td>
       <td class="a1v2${cls1}">${row.v1}</td>
       <td class="a2v2${cls2}">${row.v2}</td>
       <td class="a3v2${cls3}">${row.v3}</td>
+      <td class="a4v2${cls4}">${row.v4||'—'}</td>
       <td>${winnerCell}</td>
     </tr>`;
   }).join('');
@@ -601,13 +652,14 @@ function renderLog(elId, logs){
   }).join('');
 }
 
-function renderA3Factors(ranked, thresh){
-  const el=document.getElementById('a3-factors');
+function renderA3Factors(elId, ranked, thresh){
+  const el=document.getElementById(elId);
   if(!el) return;
+  const accentCol=elId==='a4-factors'?'#dc2626':'#d97706';
   if(!ranked.length){el.innerHTML='<div style="font-size:12px;color:#888;">Sin datos de factores.</div>';return;}
   const top=ranked.filter(([,s])=>s!=null&&s>-99).slice(0,6);
   el.innerHTML=top.map(([sym,score])=>{
-    const col=score>=thresh?'#d97706':score<=-2?'#E24B4A':'#888';
+    const col=score>=thresh?accentCol:score<=-2?'#E24B4A':'#888';
     return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:12px;">
       <span style="font-weight:600;">${sym}</span>
       <span style="font-weight:700;color:${col};">${score>=0?'+':''}${score}/7</span>
