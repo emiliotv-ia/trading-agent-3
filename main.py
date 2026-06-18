@@ -945,6 +945,55 @@ def make_default_state():
 
 state = make_default_state()
 
+# -------------------------------------------------------
+# SEED BAR HISTORY AT STARTUP
+# -------------------------------------------------------
+def seed_bar_history(s):
+    """
+    Fetch historical minute bars from Alpaca at startup so the agent
+    can trade immediately instead of waiting 30+ minutes to accumulate bars.
+    """
+    if not stock_data_client:
+        print("⚠️  Sin Alpaca data client — seed omitido, usando simulación")
+        return
+    min_existing = min((len(s.get("bar_history", {}).get(sym, [])) for sym in STOCK_SYMBOLS), default=0)
+    if min_existing >= MIN_BARS_CALC:
+        print(f"✅ Barras ya disponibles ({min_existing} mínimo) — seed no necesario")
+        return
+    print("🔄 Pre-cargando barras históricas de Alpaca...")
+    end   = datetime.utcnow()
+    start = end - timedelta(days=5)  # últimos 5 días para asegurar datos de mercado
+    seeded = 0
+    for sym in STOCK_SYMBOLS:
+        existing = len(s.get("bar_history", {}).get(sym, []))
+        if existing >= MIN_BARS_CALC:
+            continue
+        try:
+            req  = StockBarsRequest(symbol_or_symbols=sym,
+                                    timeframe=TimeFrame.Minute,
+                                    start=start, end=end,
+                                    limit=MAX_BARS,
+                                    feed="iex")
+            bars = stock_data_client.get_stock_bars(req)
+            bl   = bars[sym] if sym in bars else []
+            if bl:
+                for bar in bl[-MAX_BARS:]:
+                    _append_bar(s, sym, bar.open, bar.high, bar.low, bar.close, bar.volume)
+                s["prices"][sym] = float(bl[-1].close)
+                seeded += 1
+                print(f"  ✅ {sym}: {len(bl)} barras cargadas @ ${bl[-1].close:.2f}")
+            else:
+                print(f"  ⚠️  {sym}: sin datos de Alpaca, se usará simulación")
+            time.sleep(0.3)
+        except Exception as e:
+            print(f"  ❌ Seed error {sym}: {e}")
+    if seeded > 0:
+        min_bars = min(len(s["bar_history"].get(sym, [])) for sym in STOCK_SYMBOLS)
+        print(f"✅ Seed completo — {seeded}/{len(STOCK_SYMBOLS)} símbolos · mínimo {min_bars} barras")
+    else:
+        print("⚠️  Seed sin datos reales (mercado cerrado o sin conexión) — usando simulación")
+
+
 def init_state():
     global state
     saved = load_state()
@@ -968,6 +1017,8 @@ def init_state():
         print("✅ Estado restaurado desde DB")
     else:
         print("🆕 Estado inicial creado")
+    # Pre-cargar barras históricas al arrancar (sin importar si hay DB o no)
+    seed_bar_history(state)
     # Siempre arrancar si hay API keys — nunca depender del estado guardado en DB
     if ALPACA_API_KEY and ALPACA_SECRET_KEY:
         state["running"] = True
